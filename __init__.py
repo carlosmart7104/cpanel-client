@@ -2,7 +2,7 @@ import requests
 
 class cPanel():
 	"""
-		cPanel es una clase que permite gestionar servidores con cPanel API v2
+		cPanel is a class that allows you to manage servers with cPanel JSON-API v2
 	"""
 	init = {
 		'protocol': 'https',
