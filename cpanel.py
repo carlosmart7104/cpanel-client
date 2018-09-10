@@ -28,9 +28,10 @@ class cPanel():
 	query_string = ''
 	res = None
 
-	def __init__(self, args, api = None, auth = None):
-		for k in args.keys():
-			self.init[k] = args[k]
+	def __init__(self, init = None, api = None, auth = None):
+		if (init != None):
+			for k in init.keys():
+				self.init[k] = init[k]
 		if (api != None):
 			for k in api.keys():
 				self.api[k] = api[k]
@@ -38,9 +39,15 @@ class cPanel():
 			for k in auth.keys():
 				self.auth[k] = auth[k]
 
-	def set_api_func(self, args):
-		for k in args.keys():
-			self.api[k] = args[k]
+	def set_api(self, api):
+		for k in api.keys():
+			self.api[k] = api[k]
+
+	def set_api_module(self, module):
+		self.api['cpanel_api_module'] = module
+
+	def set_api_func(self, func):
+		self.api['cpanel_api_func'] = func
 
 	def set_auth(self, user = 'root', password = ''):
 		self.auth['user'] = user
@@ -62,20 +69,42 @@ class cPanel():
 			self.api['params_string'] = params_string
 
 		self.set_query()
-		res = requests.get(self.query_string, auth=(self.auth['user'], self.auth['password'])).json()
-		self.res = res['cpanelresult']
+		self.res = requests.get(self.query_string, auth=(self.auth['user'], self.auth['password'])).json()
 
 	def response(self):
 		return self.res
 
-	def get_errors(self):
-		return self.res['error']
+	def get_response(self):
+		return self.res['cpanelresult']
+
+	def get_preevent(self):
+		return self.res['cpanelresult']['preevent']
+
+	def get_preevent_result(self):
+		return self.res['cpanelresult']['preevent']['result']
 
 	def get_event(self):
-		return self.res['event']
+		return self.res['cpanelresult']['event']
 
-	def get_result(self):
-		return self.res['event']['result']
+	def get_event_result(self):
+		return self.res['cpanelresult']['event']['result']
+
+	def get_postevent(self):
+		return self.res['cpanelresult']['postevent']
+
+	def get_postevent_result(self):
+		return self.res['cpanelresult']['postevent']['result']
 
 	def get_data(self):
-		return self.res['data']
+		return self.res['cpanelresult']['data']
+
+	def get_errors(self):
+		data = self.get_data()
+		errors = []
+		for d in data:
+			if (d['result'] == 0):
+				errors.append(d['reason'])
+		return errors
+
+	def get_status(self):
+		return self.get_errors() == []
