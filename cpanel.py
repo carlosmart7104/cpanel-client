@@ -102,6 +102,8 @@ class cPanel():
 		data = self.get_data()
 		errors = []
 		for d in data:
+			if (not 'result' in d):
+				break
 			if (d['result'] == 0):
 				errors.append(d['reason'])
 		return errors
